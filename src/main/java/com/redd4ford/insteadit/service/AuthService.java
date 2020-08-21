@@ -1,5 +1,8 @@
 package com.redd4ford.insteadit.service;
 
+import com.redd4ford.insteadit.security.JwtProvider;
+import com.redd4ford.insteadit.dto.AuthenticationResponse;
+import com.redd4ford.insteadit.dto.LoginRequest;
 import com.redd4ford.insteadit.dto.RegisterRequest;
 import com.redd4ford.insteadit.exception.InsteaditException;
 import com.redd4ford.insteadit.model.NotificationEmail;
@@ -8,6 +11,10 @@ import com.redd4ford.insteadit.model.VerificationToken;
 import com.redd4ford.insteadit.repository.UserRepository;
 import com.redd4ford.insteadit.repository.VerificationTokenRepository;
 import org.slf4j.Logger;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +31,8 @@ public class AuthService {
 
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
+  private final AuthenticationManager authenticationManager;
+  private final JwtProvider jwtProvider;
   private final VerificationTokenRepository verificationTokenRepository;
   private final MailContentBuilder mailContentBuilder;
   private final MailService mailService;
@@ -31,11 +40,15 @@ public class AuthService {
   private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AuthService.class);
 
   public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder,
+                     AuthenticationManager authenticationManager,
+                     JwtProvider jwtProvider,
                      VerificationTokenRepository verificationTokenRepository,
                      MailContentBuilder mailContentBuilder,
                      MailService mailService) {
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
+    this.authenticationManager = authenticationManager;
+    this.jwtProvider = jwtProvider;
     this.verificationTokenRepository = verificationTokenRepository;
     this.mailContentBuilder = mailContentBuilder;
     this.mailService = mailService;
@@ -51,11 +64,13 @@ public class AuthService {
     user.setEnabled(false);
 
     userRepository.save(user);
+    log.info("User is registered successfully. Sending an activation email...");
 
     String token = generateVerificationToken(user);
-    String message = mailContentBuilder.build("Thank you for signing up to InsteadIt! Please click on the link below to activate your account: "
+    String message = mailContentBuilder.build("Thank you for signing up to InsteadIt!" +
+        "Please click on the link below to activate your account: "
         + ACTIVATION_EMAIL + "/" + token);
-    mailService.sendMail(new NotificationEmail("Please Activate your account", user.getEmail(), message));
+    mailService.sendMail(new NotificationEmail("Welcome to InsteadIt!", user.getEmail(), message));
   }
 
   private String generateVerificationToken(User user) {
@@ -76,9 +91,19 @@ public class AuthService {
 
   public void fetchUserAndEnable(VerificationToken verificationToken) {
     String username = verificationToken.getUser().getUsername();
-    User user = userRepository.findByUsername(username).orElseThrow(() -> new InsteaditException("User Not Found with id - " + username));
+    User user = userRepository.findByUsername(username).orElseThrow(() ->
+        new InsteaditException("User with id " + username + " is not found"));
     user.setEnabled(true);
     userRepository.save(user);
+  }
+
+  public AuthenticationResponse login(LoginRequest loginRequest) {
+    Authentication authenticate = authenticationManager
+        .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
+        loginRequest.getPassword()));
+    SecurityContextHolder.getContext().setAuthentication(authenticate);
+    String authenticationToken = jwtProvider.generateToken(authenticate);
+    return new AuthenticationResponse(authenticationToken, loginRequest.getUsername());
   }
 
   private String encodePassword(String password) {
