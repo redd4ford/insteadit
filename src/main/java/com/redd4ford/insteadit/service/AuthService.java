@@ -15,10 +15,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -84,7 +85,8 @@ public class AuthService {
 
   @Transactional
   public void verifyAccount(String token) {
-    Optional<VerificationToken> verificationTokenOptional = verificationTokenRepository.findByToken(token);
+    Optional<VerificationToken> verificationTokenOptional =
+        verificationTokenRepository.findByToken(token);
     verificationTokenOptional.orElseThrow(() -> new InsteaditException("Invalid Token"));
     fetchUserAndEnable(verificationTokenOptional.get());
   }
@@ -104,6 +106,18 @@ public class AuthService {
     SecurityContextHolder.getContext().setAuthentication(authenticate);
     String authenticationToken = jwtProvider.generateToken(authenticate);
     return new AuthenticationResponse(authenticationToken, loginRequest.getUsername());
+  }
+
+  @Transactional(readOnly = true)
+  User getCurrentUser() {
+    org.springframework.security.core.userdetails.User principal =
+        (org.springframework.security.core.userdetails.User) SecurityContextHolder
+            .getContext()
+            .getAuthentication()
+            .getPrincipal();
+    return userRepository.findByUsername(principal.getUsername())
+        .orElseThrow(() -> new UsernameNotFoundException("User not found - " +
+            principal.getUsername()));
   }
 
   private String encodePassword(String password) {
