@@ -33,18 +33,18 @@ public class ThreadService {
         .collect(toList());
   }
 
-  @Transactional
-  public ThreadDto save(ThreadDto threadDto) {
-    Thread thread = threadRepository.save(threadMapper.mapDtoToThread(threadDto));
-    threadDto.setId(thread.getId());
-    return threadDto;
-  }
-
   @Transactional(readOnly = true)
   public ThreadDto getThread(Long id) {
     Thread thread = threadRepository.findById(id)
         .orElseThrow(() -> new InsteaditException("Thread not found with id -" + id));
     return threadMapper.mapThreadToDto(thread);
+  }
+
+  @Transactional
+  public ThreadDto save(ThreadDto threadDto) {
+    Thread thread = threadRepository.save(threadMapper.mapDtoToThread(threadDto));
+    threadDto.setId(thread.getId());
+    return threadDto;
   }
 
 }
