@@ -11,6 +11,7 @@ import com.redd4ford.insteadit.model.VerificationToken;
 import com.redd4ford.insteadit.repository.UserRepository;
 import com.redd4ford.insteadit.repository.VerificationTokenRepository;
 import org.slf4j.Logger;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -109,7 +110,7 @@ public class AuthService {
   }
 
   @Transactional(readOnly = true)
-  User getCurrentUser() {
+  public User getCurrentUser() {
     org.springframework.security.core.userdetails.User principal =
         (org.springframework.security.core.userdetails.User) SecurityContextHolder
             .getContext()
@@ -134,6 +135,11 @@ public class AuthService {
 
   public static Logger getLog() {
     return log;
+  }
+
+  public boolean isLoggedIn() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    return !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
   }
 
 }

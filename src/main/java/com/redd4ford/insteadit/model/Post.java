@@ -31,6 +31,7 @@ public class Post {
   @ManyToOne(fetch = LAZY)
   @JoinColumn(name = "userId", referencedColumnName = "userId")
   private User user;
+
   private Instant createdDate;
 
   @ManyToOne(fetch = LAZY)
@@ -50,6 +51,10 @@ public class Post {
   }
 
   public Post() {
+  }
+
+  public static PostBuilder builder() {
+    return new PostBuilder();
   }
 
   public Long getPostId() {
@@ -118,4 +123,69 @@ public class Post {
     this.thread = thread;
   }
 
+  public static class PostBuilder {
+    private Long postId;
+    private @NotBlank(message = "Post Name cannot be empty or Null") String postName;
+    private String url;
+    private String description;
+    private Integer voteCounter;
+    private User user;
+    private Instant createdDate;
+    private Thread thread;
+
+    PostBuilder() {
+    }
+
+    public PostBuilder postId(Long postId) {
+      this.postId = postId;
+      return this;
+    }
+
+    public PostBuilder postName(@NotBlank(message = "Post Name cannot be empty or Null")
+                                    String postName) {
+      this.postName = postName;
+      return this;
+    }
+
+    public PostBuilder url(String url) {
+      this.url = url;
+      return this;
+    }
+
+    public PostBuilder description(String description) {
+      this.description = description;
+      return this;
+    }
+
+    public PostBuilder voteCounter(Integer voteCounter) {
+      this.voteCounter = voteCounter;
+      return this;
+    }
+
+    public PostBuilder user(User user) {
+      this.user = user;
+      return this;
+    }
+
+    public PostBuilder createdDate(Instant createdDate) {
+      this.createdDate = createdDate;
+      return this;
+    }
+
+    public PostBuilder thread(Thread thread) {
+      this.thread = thread;
+      return this;
+    }
+
+    public Post build() {
+      return new Post(postId, postName, url, description, voteCounter, user, createdDate, thread);
+    }
+
+    public String toString() {
+      return "Post.PostBuilder(postId=" + this.postId + ", postName=" + this.postName + ", url="
+          + this.url + ", description=" + this.description + ", voteCounter="
+          + this.voteCounter + ", user=" + this.user + ", createdDate="
+          + this.createdDate + ", thread=" + this.thread + ")";
+    }
+  }
 }
