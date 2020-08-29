@@ -48,10 +48,12 @@ public class CommentService {
     Comment comment = commentMapper.mapDtoToComment(commentDto, post, authService.getCurrentUser());
     commentRepository.save(comment);
 
-    String message = mailContentBuilder.build(comment.getUser().getUsername() +
-        " has just posted a comment on your post: " + post.getPostName() +
-        "<br> Follow the link to read it: " + POST_URL + post.getPostId());
-    sendCommentNotification(message, authService.getCurrentUser(), post.getUser());
+    if (comment.getUser() != authService.getCurrentUser()) {
+      String message = mailContentBuilder.build(comment.getUser().getUsername() +
+          " has just posted a comment on your post: " + post.getPostName() +
+          "<br> Follow the link to read it: " + POST_URL + post.getPostId());
+      sendCommentNotification(message, authService.getCurrentUser(), post.getUser());
+    }
   }
 
   private void sendCommentNotification(String message, User commenter, User recipient) {
