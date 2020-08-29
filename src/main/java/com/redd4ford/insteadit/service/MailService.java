@@ -33,9 +33,11 @@ public class MailService {
     };
     try {
       mailSender.send(messagePreparator);
-      log.info("Activation email sent!!");
+      log.info("Email sent!");
     } catch (MailException e) {
-      throw new InsteaditException("Exception occurred when sending mail to " + notificationEmail.getRecipient());
+      log.error("Exception occurred when sending mail", e);
+      throw new InsteaditException("Exception occurred when sending mail to " +
+          notificationEmail.getRecipient());
     }
   }
 
