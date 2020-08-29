@@ -31,13 +31,14 @@ public class PostController {
     return status(HttpStatus.OK).body(postService.getPost(id));
   }
 
-  @GetMapping("by-thread/{id}")
-  public ResponseEntity<List<PostResponse>> getPostsByThread(Long id) {
+  @GetMapping("/by-thread/{id}")
+  public ResponseEntity<List<PostResponse>> getPostsByThread(@PathVariable("id") Long id) {
     return status(HttpStatus.OK).body(postService.getPostsByThread(id));
   }
 
-  @GetMapping("by-user/{username}")
-  public ResponseEntity<List<PostResponse>> getPostsByUsername(String username) {
+  @GetMapping("/by-user/{username}")
+  public ResponseEntity<List<PostResponse>> getPostsByUsername(@PathVariable("username")
+                                                                     String username) {
     return status(HttpStatus.OK).body(postService.getPostsByUsername(username));
   }
 
