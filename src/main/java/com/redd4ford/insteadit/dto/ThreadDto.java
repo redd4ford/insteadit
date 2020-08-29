@@ -4,13 +4,13 @@ public class ThreadDto {
   private Long id;
   private String name;
   private String description;
-  private Integer postCount;
+  private Integer postCounter;
 
-  public ThreadDto(Long id, String name, String description, Integer postCount) {
+  public ThreadDto(Long id, String name, String description, Integer postCounter) {
     this.id = id;
     this.name = name;
     this.description = description;
-    this.postCount = postCount;
+    this.postCounter = postCounter;
   }
 
   public ThreadDto() {
@@ -45,19 +45,19 @@ public class ThreadDto {
     this.description = description;
   }
 
-  public Integer getPostCount() {
-    return postCount;
+  public Integer getPostCounter() {
+    return postCounter;
   }
 
-  public void setPostCount(Integer postCount) {
-    this.postCount = postCount;
+  public void setPostCounter(Integer postCounter) {
+    this.postCounter = postCounter;
   }
 
   public static class ThreadDtoBuilder {
     private Long id;
     private String name;
     private String description;
-    private Integer postCount;
+    private Integer postCounter;
 
     ThreadDtoBuilder() {
     }
@@ -77,18 +77,18 @@ public class ThreadDto {
       return this;
     }
 
-    public ThreadDtoBuilder postCount(Integer postCount) {
-      this.postCount = postCount;
+    public ThreadDtoBuilder postCounter(Integer postCounter) {
+      this.postCounter = postCounter;
       return this;
     }
 
     public ThreadDto build() {
-      return new ThreadDto(id, name, description, postCount);
+      return new ThreadDto(id, name, description, postCounter);
     }
 
     public String toString() {
       return "ThreadDto.ThreadDtoBuilder(id=" + this.id + ", name=" + this.name + ", description="
-          + this.description + ", postCount=" + this.postCount + ")";
+          + this.description + ", postCounter=" + this.postCounter + ")";
     }
   }
 }
