@@ -1,5 +1,7 @@
 package com.redd4ford.insteadit.model;
 
+import org.hibernate.annotations.Proxy;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -13,6 +15,7 @@ import static javax.persistence.GenerationType.SEQUENCE;
 
 @Entity
 @Table(name="\"user\"")
+@Proxy(lazy=false)
 public class User {
 
   @Id
