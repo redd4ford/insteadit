@@ -7,14 +7,14 @@ public class PostResponse {
   private String description;
   private String username;
   private String threadName;
-  private Integer voteCount;
-  private Integer commentCount;
+  private Integer voteCounter;
+  private Integer commentCounter;
   private String duration;
   private boolean upVote;
   private boolean downVote;
 
   public PostResponse(Long id, String postName, String url, String description, String username,
-                      String threadName, Integer voteCount, Integer commentCount, String duration,
+                      String threadName, Integer voteCounter, Integer commentCounter, String duration,
                       boolean upVote, boolean downVote) {
     this.id = id;
     this.postName = postName;
@@ -22,8 +22,8 @@ public class PostResponse {
     this.description = description;
     this.username = username;
     this.threadName = threadName;
-    this.voteCount = voteCount;
-    this.commentCount = commentCount;
+    this.voteCounter = voteCounter;
+    this.commentCounter = commentCounter;
     this.duration = duration;
     this.upVote = upVote;
     this.downVote = downVote;
@@ -84,20 +84,20 @@ public class PostResponse {
     this.threadName = threadName;
   }
 
-  public Integer getVoteCount() {
-    return voteCount;
+  public Integer getVoteCounter() {
+    return voteCounter;
   }
 
-  public void setVoteCount(Integer voteCount) {
-    this.voteCount = voteCount;
+  public void setVoteCounter(Integer voteCounter) {
+    this.voteCounter = voteCounter;
   }
 
-  public Integer getCommentCount() {
-    return commentCount;
+  public Integer getCommentCounter() {
+    return commentCounter;
   }
 
-  public void setCommentCount(Integer commentCount) {
-    this.commentCount = commentCount;
+  public void setCommentCounter(Integer commentCounter) {
+    this.commentCounter = commentCounter;
   }
 
   public String getDuration() {
@@ -131,8 +131,8 @@ public class PostResponse {
     private String description;
     private String username;
     private String threadName;
-    private Integer voteCount;
-    private Integer commentCount;
+    private Integer voteCounter;
+    private Integer commentCounter;
     private String duration;
     private boolean upVote;
     private boolean downVote;
@@ -170,13 +170,13 @@ public class PostResponse {
       return this;
     }
 
-    public PostResponseBuilder voteCount(Integer voteCount) {
-      this.voteCount = voteCount;
+    public PostResponseBuilder voteCounter(Integer er) {
+      this.voteCounter = voteCounter;
       return this;
     }
 
-    public PostResponseBuilder commentCount(Integer commentCount) {
-      this.commentCount = commentCount;
+    public PostResponseBuilder commentCounter(Integer commentCounter) {
+      this.commentCounter = commentCounter;
       return this;
     }
 
@@ -196,15 +196,15 @@ public class PostResponse {
     }
 
     public PostResponse build() {
-      return new PostResponse(id, postName, url, description, username, threadName, voteCount,
-          commentCount, duration, upVote, downVote);
+      return new PostResponse(id, postName, url, description, username, threadName, voteCounter,
+          commentCounter, duration, upVote, downVote);
     }
 
     public String toString() {
       return "PostResponse.PostResponseBuilder(id=" + this.id + ", postName=" + this.postName
           + ", url=" + this.url + ", description=" + this.description + ", username="
-          + this.username + ", threadName=" + this.threadName + ", voteCount=" + this.voteCount
-          + ", commentCount=" + this.commentCount + ", duration=" + this.duration + ", upVote="
+          + this.username + ", threadName=" + this.threadName + ", voteCounter=" + this.voteCounter
+          + ", commentCounter=" + this.commentCounter + ", duration=" + this.duration + ", upVote="
           + this.upVote + ", downVote=" + this.downVote + ")";
     }
   }

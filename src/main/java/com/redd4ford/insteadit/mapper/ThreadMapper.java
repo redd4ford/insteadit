@@ -23,7 +23,7 @@ public class ThreadMapper {
     threadDto.name(thread.getName());
     threadDto.description(thread.getDescription());
 
-    threadDto.postCount(mapPosts(thread.getRelatedPosts()));
+    threadDto.postCounter(mapPosts(thread.getRelatedPosts()));
 
     return threadDto.build();
   }

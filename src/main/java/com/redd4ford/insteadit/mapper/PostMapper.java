@@ -68,7 +68,7 @@ public class PostMapper {
 
     postResponse.duration(getDuration(post));
     postResponse.downVote(isPostDownVoted(post));
-    postResponse.commentCount(commentCount(post));
+    postResponse.commentCounter(commentCounter(post));
     postResponse.upVote(isPostUpVoted(post));
 
     return postResponse.build();
@@ -104,7 +104,7 @@ public class PostMapper {
     return username;
   }
 
-  Integer commentCount(Post post) {
+  Integer commentCounter(Post post) {
     return commentRepository.findByPost(post).size();
   }
 
