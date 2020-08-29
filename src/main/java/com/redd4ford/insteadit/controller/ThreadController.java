@@ -23,12 +23,12 @@ public class ThreadController {
   }
 
   @GetMapping("/{id}")
-  public ThreadDto getThread(@PathVariable Long id) {
+  public ThreadDto getThread(@PathVariable("id") Long id) {
     return threadService.getThread(id);
   }
 
   @PostMapping
-  public ThreadDto create(@RequestBody @Valid ThreadDto threadDto) {
+  public ThreadDto createThread(@RequestBody @Valid ThreadDto threadDto) {
     return threadService.save(threadDto);
   }
 }
