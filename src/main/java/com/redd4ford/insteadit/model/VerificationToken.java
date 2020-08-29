@@ -14,7 +14,7 @@ public class VerificationToken {
   private String token;
 
   @OneToOne(fetch = FetchType.LAZY)
-  private User user;
+  private com.redd4ford.insteadit.model.User user;
 
   private Instant expiryDate;
 

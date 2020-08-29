@@ -22,7 +22,7 @@ public class Comment {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "userId", referencedColumnName = "userId")
-  private User user;
+  private com.redd4ford.insteadit.model.User user;
 
   public Comment(Long id, String text, Post post, Instant createdDate, User user) {
     this.id = id;
@@ -33,6 +33,10 @@ public class Comment {
   }
 
   public Comment() {
+  }
+
+  public static CommentBuilder builder() {
+    return new CommentBuilder();
   }
 
   public Long getId() {
@@ -73,6 +77,52 @@ public class Comment {
 
   public void setUser(User user) {
     this.user = user;
+  }
+
+  public static class CommentBuilder {
+    private Long id;
+    private @NotEmpty String text;
+    private Post post;
+    private Instant createdDate;
+    private User user;
+
+    CommentBuilder() {
+    }
+
+    public CommentBuilder id(Long id) {
+      this.id = id;
+      return this;
+    }
+
+    public CommentBuilder text(@NotEmpty String text) {
+      this.text = text;
+      return this;
+    }
+
+    public CommentBuilder post(Post post) {
+      this.post = post;
+      return this;
+    }
+
+    public CommentBuilder createdDate(Instant createdDate) {
+      this.createdDate = createdDate;
+      return this;
+    }
+
+    public CommentBuilder user(User user) {
+      this.user = user;
+      return this;
+    }
+
+    public Comment build() {
+      return new Comment(id, text, post, createdDate, user);
+    }
+
+    public String toString() {
+      return "Comment.CommentBuilder(id=" + this.id + ", text=" + this.text + ", post=" + this.post
+          + ", createdDate=" + this.createdDate + ", user=" + this.user + ")";
+    }
+
   }
 
 }
