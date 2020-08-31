@@ -57,22 +57,42 @@ public class AuthService {
   }
 
   @Transactional
-  public void signup(RegisterRequest registerRequest) {
-    User user = new User();
-    user.setUsername(registerRequest.getUsername());
-    user.setEmail(registerRequest.getEmail());
-    user.setPassword(encodePassword(registerRequest.getPassword()));
-    user.setCreated(now());
-    user.setEnabled(false);
+  public boolean signup(RegisterRequest registerRequest) {
+    boolean isSuccessful = false;
+    boolean isPresentWithEmail = userRepository
+        .findByEmail(registerRequest.getEmail())
+        .isPresent();
+    boolean isPresentWithUsername = userRepository
+        .findByUsername(registerRequest.getUsername())
+        .isPresent();
 
-    userRepository.save(user);
-    log.info("User is registered successfully. Sending an activation email...");
+    if (isPresentWithEmail && isPresentWithUsername) {
+      log.info("User with email: " + registerRequest.getEmail() + " and username: " +
+          registerRequest.getUsername() + "already exists.");
+    } else if (isPresentWithEmail) {
+      log.info("User with email: " + registerRequest.getEmail() + " already exists.");
+    } else if (isPresentWithUsername) {
+      log.info("User with username: " + registerRequest.getUsername() + " already exists.");
+    } else {
+      isSuccessful = true;
+      User user = new User();
+      user.setUsername(registerRequest.getUsername());
+      user.setEmail(registerRequest.getEmail());
+      user.setPassword(encodePassword(registerRequest.getPassword()));
+      user.setCreated(now());
+      user.setEnabled(false);
 
-    String token = generateVerificationToken(user);
-    String message = mailContentBuilder.build("Thank you for signing up to InsteadIt!" +
-        "Please click on the link below to activate your account: "
-        + ACTIVATION_EMAIL + "/" + token);
-    mailService.sendMail(new NotificationEmail("Welcome to InsteadIt!", user.getEmail(), message));
+      userRepository.save(user);
+      log.info("User is registered successfully. Sending an activation email...");
+
+      String token = generateVerificationToken(user);
+      String message = mailContentBuilder.build("Thank you for signing up to InsteadIt!" +
+          "Please click on the link below to activate your account: "
+          + ACTIVATION_EMAIL + "/" + token);
+      mailService.sendMail(new NotificationEmail("Welcome to InsteadIt!", user.getEmail(), message));
+    }
+
+    return isSuccessful;
   }
 
   private String generateVerificationToken(User user) {
