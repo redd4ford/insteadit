@@ -67,9 +67,10 @@ public class PostMapper {
     postResponse.description(post.getDescription());
 
     postResponse.duration(getDuration(post));
-    postResponse.downVote(isPostDownVoted(post));
     postResponse.commentCounter(commentCounter(post));
+    postResponse.voteCounter(post.getVoteCounter());
     postResponse.upVote(isPostUpVoted(post));
+    postResponse.downVote(isPostDownVoted(post));
 
     return postResponse.build();
   }
@@ -82,11 +83,7 @@ public class PostMapper {
     if (thread == null) {
       return null;
     }
-    String name = thread.getName();
-    if (name == null) {
-      return null;
-    }
-    return name;
+    return thread.getName();
   }
 
   private String postUserUsername(Post post) {
