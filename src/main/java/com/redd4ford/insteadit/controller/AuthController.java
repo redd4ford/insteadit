@@ -20,8 +20,13 @@ public class AuthController {
 
   @PostMapping("/signup")
   public ResponseEntity<String> signup(@RequestBody RegisterRequest registerRequest) {
-    authService.signup(registerRequest);
-    return new ResponseEntity<>(HttpStatus.OK);
+    boolean isSuccessful = authService.signup(registerRequest);
+    if (isSuccessful) {
+      return new ResponseEntity<>(HttpStatus.OK);
+    } else {
+      return new ResponseEntity<>("User with such email and/or username cannot be signed up",
+          HttpStatus.BAD_REQUEST);
+    }
   }
 
   @PostMapping("/login")

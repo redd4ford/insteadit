@@ -2,15 +2,17 @@ package com.redd4ford.insteadit.mapper;
 
 import com.redd4ford.insteadit.dto.ThreadDto;
 import com.redd4ford.insteadit.dto.ThreadDto.ThreadDtoBuilder;
-import com.redd4ford.insteadit.model.Post;
 import com.redd4ford.insteadit.model.Thread;
 import com.redd4ford.insteadit.model.Thread.ThreadBuilder;
+import com.redd4ford.insteadit.repository.PostRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 public class ThreadMapper {
+
+  @Autowired
+  private PostRepository postRepository;
 
   public ThreadDto mapThreadToDto(Thread thread) {
     if (thread == null) {
@@ -23,7 +25,7 @@ public class ThreadMapper {
     threadDto.name(thread.getName());
     threadDto.description(thread.getDescription());
 
-    threadDto.postCount(mapPosts(thread.getRelatedPosts()));
+    threadDto.postCounter(postCounter(thread));
 
     return threadDto.build();
   }
@@ -42,8 +44,8 @@ public class ThreadMapper {
     return newThread.build();
   }
 
-  public int mapPosts(List<Post> numberOfPosts) {
-    return numberOfPosts.size();
+  Integer postCounter(Thread thread) {
+    return postRepository.findAllByThread(thread).size();
   }
 
 }

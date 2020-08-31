@@ -24,7 +24,7 @@ public class Thread {
   private Instant createdDate;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  private User user;
+  private com.redd4ford.insteadit.model.User user;
 
   public Thread(Long id, String name, String description, List<Post> relatedPosts,
                 Instant createdDate, User user) {

@@ -43,7 +43,7 @@ public class PostService {
   @Transactional(readOnly = true)
   public PostResponse getPost(Long id) {
     Post post = postRepository.findById(id)
-        .orElseThrow(() -> new InsteaditException(id.toString()));
+        .orElseThrow(() -> new InsteaditException("Post not found with id - " + id.toString()));
     return postMapper.mapPostToDto(post);
   }
 
@@ -74,14 +74,11 @@ public class PostService {
   }
 
   public void save(PostRequest postRequest) {
-    try {
-      Thread thread = threadRepository.findByName(postRequest.getThreadName());
-      postRepository.save(postMapper.mapDtoToPost(postRequest, thread,
-          authService.getCurrentUser()));
-    } catch (InsteaditException e) {
-      System.out.println("An exception occurred while trying to find a thread with name "
-          + postRequest.getThreadName());
-    }
+    Thread thread = threadRepository.findByName(postRequest.getThreadName())
+                .orElseThrow(() -> new InsteaditException("Thread not found with name - " +
+                    postRequest.getThreadName()));
+    postRepository.save(postMapper.mapDtoToPost(postRequest, thread,
+        authService.getCurrentUser()));
   }
 
 }

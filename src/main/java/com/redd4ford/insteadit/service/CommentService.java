@@ -45,17 +45,20 @@ public class CommentService {
     Post post = postRepository.findById(commentDto.getPostId())
         .orElseThrow(() -> new InsteaditException("Post not found with id - " +
             commentDto.getPostId().toString()));
-    Comment comment = commentMapper.mapDtoToComment(commentDto, post, authService.getCurrentUser());
+    Comment comment = commentMapper.mapDtoToComment(commentDto, post,
+        authService.getCurrentUser());
     commentRepository.save(comment);
 
-    String message = mailContentBuilder.build(comment.getUser().getUsername() +
-        " has just posted a comment on your post: " + post.getPostName() +
-        "<br> Follow the link to read it: " + POST_URL + post.getPostId());
-    sendCommentNotification(message, authService.getCurrentUser(), post.getUser());
+    if (!comment.getUser().getUsername().equals(post.getUser().getUsername())) {
+      String message = mailContentBuilder.build(comment.getUser().getUsername() +
+          " has just posted a comment on your post: " + post.getPostName() +
+          "<br> Follow the link to read it: " + POST_URL + post.getPostId());
+      sendCommentNotification(message, comment.getUser(), post.getUser());
+    }
   }
 
   private void sendCommentNotification(String message, User commenter, User recipient) {
-    mailService.sendMail(new NotificationEmail(commenter.getUsername() +
+    mailService.sendMail(new NotificationEmail("InsteadIt | " + commenter.getUsername() +
         " has just commented on your post", recipient.getEmail(), message));
   }
 
