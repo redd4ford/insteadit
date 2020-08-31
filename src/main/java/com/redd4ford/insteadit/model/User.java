@@ -14,8 +14,8 @@ import java.time.Instant;
 import static javax.persistence.GenerationType.SEQUENCE;
 
 @Entity
-@Table(name="\"user\"")
-@Proxy(lazy=false)
+@Table(name = "\"user\"")
+@Proxy(lazy = false)
 public class User {
 
   @Id

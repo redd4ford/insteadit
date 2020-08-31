@@ -80,6 +80,7 @@ public class Comment {
   }
 
   public static class CommentBuilder {
+
     private Long id;
     private @NotEmpty String text;
     private Post post;

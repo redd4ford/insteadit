@@ -1,6 +1,7 @@
 package com.redd4ford.insteadit.dto;
 
 public class PostResponse {
+
   private Long id;
   private String postName;
   private String url;
@@ -125,6 +126,7 @@ public class PostResponse {
   }
 
   public static class PostResponseBuilder {
+
     private Long id;
     private String postName;
     private String url;
@@ -207,5 +209,7 @@ public class PostResponse {
           + ", commentCounter=" + this.commentCounter + ", duration=" + this.duration + ", upVote="
           + this.upVote + ", downVote=" + this.downVote + ")";
     }
+
   }
+
 }

@@ -6,6 +6,7 @@ import org.thymeleaf.context.Context;
 
 @Service
 public class MailContentBuilder {
+
   private final TemplateEngine templateEngine;
 
   public MailContentBuilder(TemplateEngine templateEngine) {

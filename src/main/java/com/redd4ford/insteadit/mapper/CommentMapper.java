@@ -44,7 +44,6 @@ public class CommentMapper {
     commentDto.username(comment.getUser().getUsername());
 
     return commentDto.build();
-
   }
 
 }

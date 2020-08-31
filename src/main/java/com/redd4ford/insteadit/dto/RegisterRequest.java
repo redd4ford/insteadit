@@ -1,6 +1,7 @@
 package com.redd4ford.insteadit.dto;
 
 public class RegisterRequest {
+
   private String username;
   private String email;
   private String password;

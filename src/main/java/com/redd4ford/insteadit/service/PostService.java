@@ -10,7 +10,6 @@ import com.redd4ford.insteadit.model.User;
 import com.redd4ford.insteadit.repository.PostRepository;
 import com.redd4ford.insteadit.repository.ThreadRepository;
 import com.redd4ford.insteadit.repository.UserRepository;
-import org.slf4j.Logger;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +22,6 @@ import static java.util.stream.Collectors.toList;
 @Transactional
 public class PostService {
 
-  private static final Logger log = org.slf4j.LoggerFactory.getLogger(PostService.class);
   private final PostRepository postRepository;
   private final ThreadRepository threadRepository;
   private final UserRepository userRepository;
@@ -75,8 +73,8 @@ public class PostService {
 
   public void save(PostRequest postRequest) {
     Thread thread = threadRepository.findByName(postRequest.getThreadName())
-                .orElseThrow(() -> new InsteaditException("Thread not found with name - " +
-                    postRequest.getThreadName()));
+        .orElseThrow(() -> new InsteaditException("Thread not found with name - " +
+            postRequest.getThreadName()));
     postRepository.save(postMapper.mapDtoToPost(postRequest, thread,
         authService.getCurrentUser()));
   }

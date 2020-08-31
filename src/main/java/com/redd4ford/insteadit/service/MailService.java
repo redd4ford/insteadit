@@ -9,13 +9,13 @@ import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import static com.redd4ford.insteadit.util.Constants.LOGGER;
+
 @Service
 public class MailService {
 
   private final JavaMailSender mailSender;
   private final MailContentBuilder mailContentBuilder;
-
-  private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AuthService.class);
 
   public MailService(JavaMailSender mailSender, MailContentBuilder mailContentBuilder) {
     this.mailSender = mailSender;
@@ -31,11 +31,12 @@ public class MailService {
       messageHelper.setSubject(notificationEmail.getSubject());
       messageHelper.setText(mailContentBuilder.build(notificationEmail.getBody()));
     };
+
     try {
       mailSender.send(messagePreparator);
-      log.info("Email sent!");
+      LOGGER.info("Email sent!");
     } catch (MailException e) {
-      log.error("Exception occurred when sending mail", e);
+      LOGGER.error("Exception occurred when sending mail", e);
       throw new InsteaditException("Exception occurred when sending mail to " +
           notificationEmail.getRecipient());
     }

@@ -3,6 +3,7 @@ package com.redd4ford.insteadit.dto;
 import java.time.Instant;
 
 public class CommentDto {
+
   private Long id;
   private Long postId;
   private Instant createdDate;
@@ -65,6 +66,7 @@ public class CommentDto {
   }
 
   public static class CommentDtoBuilder {
+
     private Long id;
     private Long postId;
     private Instant createdDate;

@@ -2,6 +2,7 @@ package com.redd4ford.insteadit.security;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,6 +23,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   @Autowired
   private JwtProvider jwtProvider;
+  @Qualifier("userDetailsServiceImpl")
   @Autowired
   private UserDetailsService userDetailsService;
 
@@ -29,15 +31,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   protected void doFilterInternal(@NotNull HttpServletRequest request,
                                   @NotNull HttpServletResponse response,
                                   @NotNull FilterChain filterChain) throws ServletException,
-                                                                           IOException {
+      IOException {
     String jwt = getJwtFromRequest(request);
 
     if (StringUtils.hasText(jwt) && jwtProvider.validateToken(jwt)) {
       String username = jwtProvider.getUsernameFromJWT(jwt);
 
       UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-      UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails,
-          null, userDetails.getAuthorities());
+      UsernamePasswordAuthenticationToken authentication =
+          new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
       authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
       SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -51,6 +53,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
       return bearerToken.substring(7);
     }
+
     return bearerToken;
   }
 

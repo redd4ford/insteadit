@@ -2,9 +2,9 @@ package com.redd4ford.insteadit.security;
 
 import com.redd4ford.insteadit.exception.InsteaditException;
 import io.jsonwebtoken.Claims;
-import org.springframework.security.core.userdetails.User;
 import io.jsonwebtoken.Jwts;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -57,7 +57,7 @@ public class JwtProvider {
     try {
       return keyStore.getCertificate("insteadit").getPublicKey();
     } catch (KeyStoreException e) {
-      throw new InsteaditException("Exception occured while retrieving public key from keystore");
+      throw new InsteaditException("Exception occurred while retrieving public key from keystore");
     }
   }
 

@@ -124,6 +124,7 @@ public class Post {
   }
 
   public static class PostBuilder {
+
     private Long postId;
     private @NotBlank(message = "Post Name cannot be empty or Null") String postName;
     private String url;
@@ -187,5 +188,7 @@ public class Post {
           + this.voteCounter + ", user=" + this.user + ", createdDate="
           + this.createdDate + ", thread=" + this.thread + ")";
     }
+
   }
+
 }

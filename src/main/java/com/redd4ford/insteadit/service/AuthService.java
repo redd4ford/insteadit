@@ -1,6 +1,5 @@
 package com.redd4ford.insteadit.service;
 
-import com.redd4ford.insteadit.security.JwtProvider;
 import com.redd4ford.insteadit.dto.AuthenticationResponse;
 import com.redd4ford.insteadit.dto.LoginRequest;
 import com.redd4ford.insteadit.dto.RegisterRequest;
@@ -10,7 +9,7 @@ import com.redd4ford.insteadit.model.User;
 import com.redd4ford.insteadit.model.VerificationToken;
 import com.redd4ford.insteadit.repository.UserRepository;
 import com.redd4ford.insteadit.repository.VerificationTokenRepository;
-import org.slf4j.Logger;
+import com.redd4ford.insteadit.security.JwtProvider;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,11 +20,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import java.util.Optional;
 import java.util.UUID;
 
 import static com.redd4ford.insteadit.util.Constants.ACTIVATION_EMAIL;
+import static com.redd4ford.insteadit.util.Constants.LOGGER;
 import static java.time.Instant.now;
 
 @Service
@@ -38,8 +37,6 @@ public class AuthService {
   private final VerificationTokenRepository verificationTokenRepository;
   private final MailContentBuilder mailContentBuilder;
   private final MailService mailService;
-
-  private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AuthService.class);
 
   public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder,
                      AuthenticationManager authenticationManager,
@@ -67,12 +64,12 @@ public class AuthService {
         .isPresent();
 
     if (isPresentWithEmail && isPresentWithUsername) {
-      log.info("User with email: " + registerRequest.getEmail() + " and username: " +
+      LOGGER.info("User with email: " + registerRequest.getEmail() + " and username: " +
           registerRequest.getUsername() + "already exists.");
     } else if (isPresentWithEmail) {
-      log.info("User with email: " + registerRequest.getEmail() + " already exists.");
+      LOGGER.info("User with email: " + registerRequest.getEmail() + " already exists.");
     } else if (isPresentWithUsername) {
-      log.info("User with username: " + registerRequest.getUsername() + " already exists.");
+      LOGGER.info("User with username: " + registerRequest.getUsername() + " already exists.");
     } else {
       isSuccessful = true;
       User user = new User();
@@ -83,7 +80,7 @@ public class AuthService {
       user.setEnabled(false);
 
       userRepository.save(user);
-      log.info("User is registered successfully. Sending an activation email...");
+      LOGGER.info("User is registered successfully. Sending an activation email...");
 
       String token = generateVerificationToken(user);
       String message = mailContentBuilder.build("Thank you for signing up to InsteadIt!" +
@@ -123,7 +120,7 @@ public class AuthService {
   public AuthenticationResponse login(LoginRequest loginRequest) {
     Authentication authenticate = authenticationManager
         .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
-        loginRequest.getPassword()));
+            loginRequest.getPassword()));
     SecurityContextHolder.getContext().setAuthentication(authenticate);
     String authenticationToken = jwtProvider.generateToken(authenticate);
     return new AuthenticationResponse(authenticationToken, loginRequest.getUsername());
@@ -153,13 +150,10 @@ public class AuthService {
     return passwordEncoder;
   }
 
-  public static Logger getLog() {
-    return log;
-  }
-
   public boolean isLoggedIn() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    return !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
+    return !(authentication instanceof AnonymousAuthenticationToken)
+        && authentication.isAuthenticated();
   }
 
 }

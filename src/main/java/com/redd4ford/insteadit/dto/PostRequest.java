@@ -1,6 +1,7 @@
 package com.redd4ford.insteadit.dto;
 
 public class PostRequest {
+
   private Long postId;
   private String threadName;
   private String postName;

@@ -19,7 +19,8 @@ public class VoteService {
   private final PostRepository postRepository;
   private final AuthService authService;
 
-  public VoteService(VoteRepository voteRepository, PostRepository postRepository, AuthService authService) {
+  public VoteService(VoteRepository voteRepository, PostRepository postRepository,
+                     AuthService authService) {
     this.voteRepository = voteRepository;
     this.postRepository = postRepository;
     this.authService = authService;
@@ -32,19 +33,22 @@ public class VoteService {
             voteDto.getPostId()));
     Optional<Vote> voteByPostAndUser =
         voteRepository.findTopByPostAndUserOrderByVoteIdDesc(post, authService.getCurrentUser());
+
     if (voteByPostAndUser.isPresent() &&
         voteByPostAndUser.get().getVoteType()
             .equals(voteDto.getVoteType())) {
       throw new InsteaditException("You have already "
-          + voteDto.getVoteType() + "'d for this post");
-    }
-    if (VoteType.UPVOTE.equals(voteDto.getVoteType())) {
-      post.setVoteCounter(post.getVoteCounter() + 1);
+          + voteDto.getVoteType().toString().toLowerCase() + "d for this post");
     } else {
-      post.setVoteCounter(post.getVoteCounter() - 1);
+      if (voteDto.getVoteType() == VoteType.UPVOTE) {
+        post.setVoteCounter(post.getVoteCounter() + 1);
+      } else {
+        post.setVoteCounter(post.getVoteCounter() - 1);
+      }
+
+      postRepository.save(post);
+      voteRepository.save(mapToVote(voteDto, post));
     }
-    voteRepository.save(mapToVote(voteDto, post));
-    postRepository.save(post);
   }
 
   private Vote mapToVote(VoteDto voteDto, Post post) {

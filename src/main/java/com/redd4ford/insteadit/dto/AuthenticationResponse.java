@@ -1,6 +1,7 @@
 package com.redd4ford.insteadit.dto;
 
 public class AuthenticationResponse {
+
   private String authenticationToken;
   private String username;
 
