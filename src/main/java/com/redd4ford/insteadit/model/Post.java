@@ -26,11 +26,11 @@ public class Post {
   @Lob
   private String description;
 
-  private Integer voteCounter;
+  private Integer voteCounter = 0;
 
   @ManyToOne(fetch = LAZY)
   @JoinColumn(name = "userId", referencedColumnName = "userId")
-  private User user;
+  private com.redd4ford.insteadit.model.User user;
 
   private Instant createdDate;
 
@@ -128,7 +128,7 @@ public class Post {
     private @NotBlank(message = "Post Name cannot be empty or Null") String postName;
     private String url;
     private String description;
-    private Integer voteCounter;
+    private Integer voteCounter = 0;
     private User user;
     private Instant createdDate;
     private Thread thread;
