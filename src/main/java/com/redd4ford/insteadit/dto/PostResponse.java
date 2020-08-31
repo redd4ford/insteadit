@@ -170,7 +170,7 @@ public class PostResponse {
       return this;
     }
 
-    public PostResponseBuilder voteCounter(Integer er) {
+    public PostResponseBuilder voteCounter(Integer voteCounter) {
       this.voteCounter = voteCounter;
       return this;
     }
