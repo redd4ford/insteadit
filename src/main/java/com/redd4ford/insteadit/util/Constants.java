@@ -14,6 +14,9 @@ public final class Constants {
   public static final org.slf4j.Logger LOGGER =
       org.slf4j.LoggerFactory.getLogger(AuthService.class);
 
+  // 12 hours until the token expires
+  public static final int JWT_EXPIRATION_IN_MILLS = 43200000;
+
   private Constants() {
   }
 
@@ -27,6 +30,10 @@ public final class Constants {
 
   public static Logger getLOGGER() {
     return LOGGER;
+  }
+
+  public static int getJwtExpirationInMills() {
+    return JWT_EXPIRATION_IN_MILLS;
   }
 
 }
