@@ -68,6 +68,7 @@ public class Vote {
   }
 
   public static class VoteBuilder {
+
     private Long voteId;
     private VoteType voteType;
     private @NotNull Post post;

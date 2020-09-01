@@ -29,7 +29,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     Optional<User> userOptional = userRepository.findByUsername(username);
     User user = userOptional.orElseThrow(() -> new UsernameNotFoundException("No user " +
-                                               "found with username : " + username));
+        "found with username : " + username));
 
     return new org.springframework.security
         .core.userdetails.User(user.getUsername(), user.getPassword(),

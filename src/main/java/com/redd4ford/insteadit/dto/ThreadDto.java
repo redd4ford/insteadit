@@ -1,6 +1,7 @@
 package com.redd4ford.insteadit.dto;
 
 public class ThreadDto {
+
   private Long id;
   private String name;
   private String description;
@@ -54,6 +55,7 @@ public class ThreadDto {
   }
 
   public static class ThreadDtoBuilder {
+
     private Long id;
     private String name;
     private String description;
@@ -90,5 +92,7 @@ public class ThreadDto {
       return "ThreadDto.ThreadDtoBuilder(id=" + this.id + ", name=" + this.name + ", description="
           + this.description + ", postCounter=" + this.postCounter + ")";
     }
+
   }
+
 }

@@ -3,9 +3,7 @@ package com.redd4ford.insteadit.model;
 public class NotificationEmail {
 
   private String subject;
-
   private String recipient;
-
   private String body;
 
   public NotificationEmail(String subject, String recipient, String body) {

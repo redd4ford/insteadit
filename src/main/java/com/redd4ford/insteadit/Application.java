@@ -12,13 +12,13 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @ComponentScan({"com.redd4ford.insteadit.*"})
 @EnableJpaRepositories({"com.redd4ford.insteadit.repository"})
 @EntityScan(
-		basePackageClasses = {Application.class, Jsr310JpaConverters.class}
+    basePackageClasses = {Application.class, Jsr310JpaConverters.class}
 )
 @EnableAsync
 public class Application {
 
-	public static void main(String[] args) throws Throwable {
-		SpringApplication.run(Application.class, args);
-	}
+  public static void main(String[] args) throws Throwable {
+    SpringApplication.run(Application.class, args);
+  }
 
 }

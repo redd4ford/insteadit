@@ -92,6 +92,7 @@ public class Thread {
   }
 
   public static class ThreadBuilder {
+
     private Long id;
     private @NotBlank(message = "A thread should have its name") String name;
     private @NotBlank(message = "Description cannot be empty") String description;
@@ -142,5 +143,7 @@ public class Thread {
           + this.description + ", relatedPosts=" + this.relatedPosts + ", createdDate="
           + this.createdDate + ", user=" + this.user + ")";
     }
+
   }
+
 }

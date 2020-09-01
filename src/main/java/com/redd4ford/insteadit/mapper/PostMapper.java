@@ -125,6 +125,7 @@ public class PostMapper {
       return voteForPostByUser.filter(vote -> vote.getVoteType().equals(voteType))
           .isPresent();
     }
+
     return false;
   }
 

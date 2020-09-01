@@ -1,8 +1,8 @@
 package com.redd4ford.insteadit.service;
 
-import com.redd4ford.insteadit.security.JwtProvider;
 import com.redd4ford.insteadit.dto.AuthenticationResponse;
 import com.redd4ford.insteadit.dto.LoginRequest;
+import com.redd4ford.insteadit.dto.RefreshTokenRequest;
 import com.redd4ford.insteadit.dto.RegisterRequest;
 import com.redd4ford.insteadit.exception.InsteaditException;
 import com.redd4ford.insteadit.model.NotificationEmail;
@@ -10,7 +10,7 @@ import com.redd4ford.insteadit.model.User;
 import com.redd4ford.insteadit.model.VerificationToken;
 import com.redd4ford.insteadit.repository.UserRepository;
 import com.redd4ford.insteadit.repository.VerificationTokenRepository;
-import org.slf4j.Logger;
+import com.redd4ford.insteadit.security.JwtProvider;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,14 +21,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.redd4ford.insteadit.util.Constants.ACTIVATION_EMAIL;
+import static com.redd4ford.insteadit.util.Constants.*;
 import static java.time.Instant.now;
 
 @Service
+@Transactional
 public class AuthService {
 
   private final UserRepository userRepository;
@@ -38,15 +39,14 @@ public class AuthService {
   private final VerificationTokenRepository verificationTokenRepository;
   private final MailContentBuilder mailContentBuilder;
   private final MailService mailService;
-
-  private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AuthService.class);
+  private final RefreshTokenService refreshTokenService;
 
   public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder,
                      AuthenticationManager authenticationManager,
                      JwtProvider jwtProvider,
                      VerificationTokenRepository verificationTokenRepository,
                      MailContentBuilder mailContentBuilder,
-                     MailService mailService) {
+                     MailService mailService, RefreshTokenService refreshTokenService) {
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
     this.authenticationManager = authenticationManager;
@@ -54,6 +54,7 @@ public class AuthService {
     this.verificationTokenRepository = verificationTokenRepository;
     this.mailContentBuilder = mailContentBuilder;
     this.mailService = mailService;
+    this.refreshTokenService = refreshTokenService;
   }
 
   @Transactional
@@ -67,12 +68,12 @@ public class AuthService {
         .isPresent();
 
     if (isPresentWithEmail && isPresentWithUsername) {
-      log.info("User with email: " + registerRequest.getEmail() + " and username: " +
+      LOGGER.info("User with email: " + registerRequest.getEmail() + " and username: " +
           registerRequest.getUsername() + "already exists.");
     } else if (isPresentWithEmail) {
-      log.info("User with email: " + registerRequest.getEmail() + " already exists.");
+      LOGGER.info("User with email: " + registerRequest.getEmail() + " already exists.");
     } else if (isPresentWithUsername) {
-      log.info("User with username: " + registerRequest.getUsername() + " already exists.");
+      LOGGER.info("User with username: " + registerRequest.getUsername() + " already exists.");
     } else {
       isSuccessful = true;
       User user = new User();
@@ -83,13 +84,14 @@ public class AuthService {
       user.setEnabled(false);
 
       userRepository.save(user);
-      log.info("User is registered successfully. Sending an activation email...");
+      LOGGER.info("User is registered successfully. Sending an activation email...");
 
       String token = generateVerificationToken(user);
       String message = mailContentBuilder.build("Thank you for signing up to InsteadIt!" +
           "Please click on the link below to activate your account: "
           + ACTIVATION_EMAIL + "/" + token);
-      mailService.sendMail(new NotificationEmail("Welcome to InsteadIt!", user.getEmail(), message));
+      mailService.sendMail(new NotificationEmail("Welcome to InsteadIt!", user.getEmail(),
+          message));
     }
 
     return isSuccessful;
@@ -123,10 +125,14 @@ public class AuthService {
   public AuthenticationResponse login(LoginRequest loginRequest) {
     Authentication authenticate = authenticationManager
         .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
-        loginRequest.getPassword()));
+            loginRequest.getPassword()));
     SecurityContextHolder.getContext().setAuthentication(authenticate);
-    String authenticationToken = jwtProvider.generateToken(authenticate);
-    return new AuthenticationResponse(authenticationToken, loginRequest.getUsername());
+    return AuthenticationResponse.builder()
+        .authenticationToken(jwtProvider.generateToken(authenticate))
+        .refreshToken(refreshTokenService.generateRefreshToken().getToken())
+        .expiresAt(Instant.now().plusMillis(JWT_EXPIRATION_IN_MILLS))
+        .username(loginRequest.getUsername())
+        .build();
   }
 
   @Transactional(readOnly = true)
@@ -141,25 +147,25 @@ public class AuthService {
             principal.getUsername()));
   }
 
+  public AuthenticationResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
+    refreshTokenService.validateRefreshToken(refreshTokenRequest.getRefreshToken());
+    String token = jwtProvider.generateTokenWithUserName(refreshTokenRequest.getUsername());
+    return AuthenticationResponse.builder()
+        .authenticationToken(token)
+        .refreshToken(refreshTokenRequest.getRefreshToken())
+        .expiresAt(Instant.now().plusMillis(JWT_EXPIRATION_IN_MILLS))
+        .username(refreshTokenRequest.getUsername())
+        .build();
+  }
+
   private String encodePassword(String password) {
     return passwordEncoder.encode(password);
   }
 
-  public UserRepository getUserRepository() {
-    return userRepository;
-  }
-
-  public PasswordEncoder getPasswordEncoder() {
-    return passwordEncoder;
-  }
-
-  public static Logger getLog() {
-    return log;
-  }
-
   public boolean isLoggedIn() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    return !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
+    return !(authentication instanceof AnonymousAuthenticationToken)
+        && authentication.isAuthenticated();
   }
 
 }

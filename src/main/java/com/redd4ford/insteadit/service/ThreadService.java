@@ -5,7 +5,6 @@ import com.redd4ford.insteadit.exception.InsteaditException;
 import com.redd4ford.insteadit.mapper.ThreadMapper;
 import com.redd4ford.insteadit.model.Thread;
 import com.redd4ford.insteadit.repository.ThreadRepository;
-import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +15,6 @@ import static java.util.stream.Collectors.toList;
 @Service
 public class ThreadService {
 
-  private static final Logger log = org.slf4j.LoggerFactory.getLogger(ThreadService.class);
   private final ThreadRepository threadRepository;
   private final ThreadMapper threadMapper;
 

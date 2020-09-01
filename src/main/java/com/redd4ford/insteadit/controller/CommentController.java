@@ -20,14 +20,14 @@ public class CommentController {
 
   @GetMapping("/by-post/{id}")
   public ResponseEntity<List<CommentDto>> getAllCommentsByPost(@PathVariable("id")
-                                                                       Long postId) {
+                                                                   Long postId) {
     return ResponseEntity.status(HttpStatus.OK)
         .body(commentService.getCommentsByPost(postId));
   }
 
   @GetMapping("/by-user/{username}")
   public ResponseEntity<List<CommentDto>> getAllCommentsByUser(@PathVariable("username")
-                                                                      String username) {
+                                                                   String username) {
     return ResponseEntity.status(HttpStatus.OK).body(commentService.getCommentsByUser(username));
   }
 

@@ -1,6 +1,7 @@
 package com.redd4ford.insteadit.dto;
 
 public class LoginRequest {
+
   private String username;
   private String password;
 

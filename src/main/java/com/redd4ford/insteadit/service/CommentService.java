@@ -15,11 +15,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.redd4ford.insteadit.util.Constants.POST_URL;
 import static java.util.stream.Collectors.toList;
 
 @Service
 public class CommentService {
-  private static final String POST_URL = "http://localhost:8080/api/posts/";
+
   private final PostRepository postRepository;
   private final UserRepository userRepository;
   private final AuthService authService;
