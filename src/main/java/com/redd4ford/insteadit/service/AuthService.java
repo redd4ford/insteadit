@@ -2,6 +2,7 @@ package com.redd4ford.insteadit.service;
 
 import com.redd4ford.insteadit.dto.AuthenticationResponse;
 import com.redd4ford.insteadit.dto.LoginRequest;
+import com.redd4ford.insteadit.dto.RefreshTokenRequest;
 import com.redd4ford.insteadit.dto.RegisterRequest;
 import com.redd4ford.insteadit.exception.InsteaditException;
 import com.redd4ford.insteadit.model.NotificationEmail;
@@ -20,14 +21,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.redd4ford.insteadit.util.Constants.ACTIVATION_EMAIL;
-import static com.redd4ford.insteadit.util.Constants.LOGGER;
+import static com.redd4ford.insteadit.util.Constants.*;
 import static java.time.Instant.now;
 
 @Service
+@Transactional
 public class AuthService {
 
   private final UserRepository userRepository;
@@ -37,13 +39,14 @@ public class AuthService {
   private final VerificationTokenRepository verificationTokenRepository;
   private final MailContentBuilder mailContentBuilder;
   private final MailService mailService;
+  private final RefreshTokenService refreshTokenService;
 
   public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder,
                      AuthenticationManager authenticationManager,
                      JwtProvider jwtProvider,
                      VerificationTokenRepository verificationTokenRepository,
                      MailContentBuilder mailContentBuilder,
-                     MailService mailService) {
+                     MailService mailService, RefreshTokenService refreshTokenService) {
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
     this.authenticationManager = authenticationManager;
@@ -51,6 +54,7 @@ public class AuthService {
     this.verificationTokenRepository = verificationTokenRepository;
     this.mailContentBuilder = mailContentBuilder;
     this.mailService = mailService;
+    this.refreshTokenService = refreshTokenService;
   }
 
   @Transactional
@@ -86,7 +90,8 @@ public class AuthService {
       String message = mailContentBuilder.build("Thank you for signing up to InsteadIt!" +
           "Please click on the link below to activate your account: "
           + ACTIVATION_EMAIL + "/" + token);
-      mailService.sendMail(new NotificationEmail("Welcome to InsteadIt!", user.getEmail(), message));
+      mailService.sendMail(new NotificationEmail("Welcome to InsteadIt!", user.getEmail(),
+          message));
     }
 
     return isSuccessful;
@@ -122,8 +127,12 @@ public class AuthService {
         .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
             loginRequest.getPassword()));
     SecurityContextHolder.getContext().setAuthentication(authenticate);
-    String authenticationToken = jwtProvider.generateToken(authenticate);
-    return new AuthenticationResponse(authenticationToken, loginRequest.getUsername());
+    return AuthenticationResponse.builder()
+        .authenticationToken(jwtProvider.generateToken(authenticate))
+        .refreshToken(refreshTokenService.generateRefreshToken().getToken())
+        .expiresAt(Instant.now().plusMillis(JWT_EXPIRATION_IN_MILLS))
+        .username(loginRequest.getUsername())
+        .build();
   }
 
   @Transactional(readOnly = true)
@@ -138,16 +147,19 @@ public class AuthService {
             principal.getUsername()));
   }
 
+  public AuthenticationResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
+    refreshTokenService.validateRefreshToken(refreshTokenRequest.getRefreshToken());
+    String token = jwtProvider.generateTokenWithUserName(refreshTokenRequest.getUsername());
+    return AuthenticationResponse.builder()
+        .authenticationToken(token)
+        .refreshToken(refreshTokenRequest.getRefreshToken())
+        .expiresAt(Instant.now().plusMillis(JWT_EXPIRATION_IN_MILLS))
+        .username(refreshTokenRequest.getUsername())
+        .build();
+  }
+
   private String encodePassword(String password) {
     return passwordEncoder.encode(password);
-  }
-
-  public UserRepository getUserRepository() {
-    return userRepository;
-  }
-
-  public PasswordEncoder getPasswordEncoder() {
-    return passwordEncoder;
   }
 
   public boolean isLoggedIn() {
